@@ -34,7 +34,11 @@ def populate_exercise_table(drop=True):
         for command in DROP_TABLE_COMMANDS:
             db.execute(command)
 
-    db.initialiaze_database()
+
+    try:
+        db.initialiaze_database()
+    except psycopg2.errors.DuplicateTable:
+        print("Table already exists — skipping creation.")
 
     # Adjust path as needed depending on where your JSON file is
     json_path = Path(__file__).resolve().parent.parent.parent / 'algorithm' / 'dataset_7.json'

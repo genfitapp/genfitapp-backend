@@ -12,7 +12,8 @@ from .records.routes import records_bp
 from .workout.routes import workout_bp
 from .stats.routes import stats_bp
 from app.media.routes import media_bp
-from .db import db  # import the db instance from the new module
+from .db import db
+from .utils import populate_exercise_table
 
 from dotenv import load_dotenv  # <-- if you’re using a .env
 
@@ -76,4 +77,8 @@ def create_app():
     def healthz():
         return "ok", 200
 
+    # ---------------------------
+    # Ensure DB on startup
+    # ---------------------------
+    populate_exercise_table(db, drop=False)
     return app
