@@ -1,8 +1,12 @@
 import math
 import random
 import pandas as pd
+from pathlib import Path
 from itertools import combinations
 from .temp import gym_equipment
+
+# Path to exercises.json in the same folder as this file
+EXERCISES_PATH = Path(__file__).resolve().parent / "exercises.json"
 
 # ---------------------------------------------------------------------
 # Day-combination validators
@@ -1218,7 +1222,7 @@ def determine_user_exercise_weight(
 
     # path = r'app\workout\exercises_original.json'
     path = r'app\workout\exercises.json'
-    df = pd.read_json(path)
+    df = pd.read_json(EXERCISES_PATH)
 
     # Normalize inputs
     user_goals = [str(g).capitalize() for g in (user_goals or [])]
