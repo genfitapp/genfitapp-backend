@@ -1,0 +1,21 @@
+{
+	"Version": "2008-10-17",
+	"Id": "PolicyForCloudFrontPrivateContent",
+	"Statement": [
+		{
+			"Sid": "AllowCloudFrontServicePrincipal",
+			"Effect": "Allow",
+			"Principal": {
+				"Service": "cloudfront.amazonaws.com"
+			},
+			"Action": "s3:GetObject",
+			"Resource": "arn:aws:s3:::genfit-animations/*",
+			"Condition": {
+				"ArnLike": {
+					"AWS:SourceArn": "arn:aws:cloudfront::293189252710:distribution/E1EYYG3MNSOEF5"
+				}
+			}
+		}
+	]
+}
+

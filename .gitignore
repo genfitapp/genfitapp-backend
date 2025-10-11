@@ -1,0 +1,4 @@
+**/__pycache__/
+
+# Ignoring .env to not leak secrets
+backend/.env
