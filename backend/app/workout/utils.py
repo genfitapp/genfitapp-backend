@@ -7,6 +7,7 @@ from .temp import gym_equipment
 
 # Path to exercises.json in the same folder as this file
 EXERCISES_PATH = Path(__file__).resolve().parent / "exercises.json"
+print(EXERCISES_PATH)
 
 # ---------------------------------------------------------------------
 # Day-combination validators
@@ -1349,7 +1350,7 @@ def workout_generator(
     """
     # path = r'app\workout\exercises_original.json'
     path = r'app\workout\exercises.json'
-    df = pd.read_json(path)
+    df = pd.read_json('./exercises.json')
     # Constants
     avg_time_per_set = 1     # minutes per set
     sets_per_exercise = 4    # sets per exercise
