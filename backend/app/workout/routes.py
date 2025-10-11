@@ -1788,7 +1788,7 @@ def update_exercise_sets(workout_id, exercise_id):
         }), 200
 
     except Exception as e:
-        print("ek", e)
+        print("error: ", e)
         return jsonify({
             "error": "Failed to update exercise sets",
             "details": str(e),

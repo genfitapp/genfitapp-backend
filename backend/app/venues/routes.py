@@ -205,7 +205,7 @@ def get_gym_setup_route(venue_id):
 def set_gym_setup_route(venue_id):
     data = request.get_json(silent=True) or {}
     val = data.get("gym_setup")
-    print(val)
+    # print(val)
     try:
         val = int(val)
     except (TypeError, ValueError):
@@ -377,7 +377,7 @@ def update_rest_time_between_set(venue_id):
             return jsonify({"error": "Venue not found"}), 404
 
         updated_rest_time = result[0][0]
-        print("Rest timer is: ", updated_rest_time)
+        # print("Rest timer is: ", updated_rest_time)
         return jsonify({
             "message": "Rest time between set updated successfully",
             "rest_time_between_set": updated_rest_time
@@ -460,7 +460,7 @@ def create_venue(user_id):
         if existing:
             return jsonify({"error": "This venue name already exists"}), 400
     except Exception as e:
-        print("Error 1")
+        print("Error: ", e)
         return jsonify({"error": "Error checking for existing venue", "details": str(e)}), 500
 
     def to_pg_array(pylist):
@@ -496,7 +496,7 @@ def create_venue(user_id):
             gym_setup = None
             goals = None
     except Exception as e:
-        print("Error 2")
+        print("Error: ", e)
         return jsonify({"error": "Error retrieving previous venue settings", "details": str(e)}), 500
 
     # Insert new venue
@@ -544,7 +544,6 @@ def create_venue(user_id):
         return jsonify({"message": "Venue created successfully", "venue_id": venue_id}), 200
 
     except Exception as e:
-        print("Error 333")
         print(e)
         return jsonify({"error": "Error creating venue", "details": str(e)}), 500
     

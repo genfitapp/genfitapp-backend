@@ -204,7 +204,7 @@ def get_equipment_id_by_name(name):
 def add_equipment():
     data = request.get_json(silent=True)
     if not data:
-        print(1)
+        # print(1)
         return jsonify({"error": "No data provided"}), 400
 
     user_id = data.get("user_id")
@@ -213,7 +213,7 @@ def add_equipment():
     quantity = data.get("quantity", None)
 
     if not user_id or not equipment_id:
-        print(user_id, equipment_id)
+        # print(user_id, equipment_id)
         return jsonify({"error": "user_id and equipment_id are required"}), 400
 
     try:

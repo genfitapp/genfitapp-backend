@@ -356,7 +356,7 @@ def seed_venue_equipment_from_setup(
     # Skip base items that are covered by weighted keys (e.g., 'Dumbbells')
     weighted_keys_norm = {normalize_key(k) for k in weighted.keys()}
     base_counts: Dict[str, int] = defaultdict(int)
-    print("base")
+    # print("base")
     for raw in base_list:
         qty, name = parse_qty_and_name(raw)
         if not name or qty is None:
@@ -367,19 +367,18 @@ def seed_venue_equipment_from_setup(
         base_counts[name] = max(base_counts[name], int(qty))
 
     inserts = 0
-    print('t')
+
     # Insert/Update base items (no weight_resistance_time)
     for name, qty in base_counts.items():
-        print("1 -> ", name, qty)
+        # print("1 -> ", name, qty)
         eq_id = ensure_equipment_id(db, name, None)
         upsert_venue_equipment(db, venue_id, eq_id, qty)
         inserts += 1
 
-    print('n')
     # Insert/Update weighted variants (e.g., Dumbbells 5..100, bands 'Light'..)
     for name, variants in weighted.items():
         for wrt, qty in (variants or {}).items():
-            print(f"name: {name} wrt: {wrt} qty: {qty}")
+            # print(f"name: {name} wrt: {wrt} qty: {qty}")
             eq_id = ensure_equipment_id(db, name, str(wrt))
             upsert_venue_equipment(db, venue_id, eq_id, int(qty))
             inserts += 1

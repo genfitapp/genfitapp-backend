@@ -117,10 +117,10 @@ def insert_venue_equipment(venue_id: int, equipment_list: Iterable[Dict[str, Any
         )
         if not (result and len(result) > 0):
             # Silent skip preserves original behavior (only logs)
-            print(
-                f"No matching equipment found for '{eq['name']}' "
-                f"with weight '{weight_val}'. Skipping insertion."
-            )
+            # print(
+            #     f"No matching equipment found for '{eq['name']}' "
+            #     f"with weight '{weight_val}'. Skipping insertion."
+            # )
             continue
 
         equipment_id = result[0][0]
@@ -132,9 +132,9 @@ def insert_venue_equipment(venue_id: int, equipment_list: Iterable[Dict[str, Any
                 """,
                 (venue_id, equipment_id, eq.get("quantity", 1)),
             )
-            print(
-                f"Inserted venue_equipment for venue_id {venue_id} with equipment_id {equipment_id}"
-            )
+            # print(
+            #     f"Inserted venue_equipment for venue_id {venue_id} with equipment_id {equipment_id}"
+            # )
         except Exception as e:
             print(f"Error inserting equipment '{eq['name']}' for venue {venue_id}: {e}")
 

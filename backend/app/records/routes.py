@@ -213,7 +213,7 @@ def get_user_records(user_id, month, year):
         }), 200
 
     except Exception as e:
-        print("waaaaaa", str(e))
+        print(str(e))
         return jsonify({
             "error": "Error retrieving workout records",
             "details": str(e)

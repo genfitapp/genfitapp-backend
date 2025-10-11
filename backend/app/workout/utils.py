@@ -7,7 +7,7 @@ from .temp import gym_equipment
 
 # Path to exercises.json in the same folder as this file
 EXERCISES_PATH = Path(__file__).resolve().parent / "exercises.json"
-print(EXERCISES_PATH)
+
 
 # ---------------------------------------------------------------------
 # Day-combination validators

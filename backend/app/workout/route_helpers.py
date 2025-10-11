@@ -553,10 +553,10 @@ def _get_user_equipment_context(db, user_id: int):
     # Convenience labels: "1 Dumbbell"/"2 Dumbbell", "1 Kettlebell"/"2 Kettlebell"
     def add_pair_labels(kind_label: str):
         if kind_label not in available_weights:
-            print("Returning...")
+            # print("Returning...")
             return
         counts = available_weights[kind_label].values()
-        print(f"{kind_label} -> {counts}")
+        # print(f"{kind_label} -> {counts}")
         if any(c >= 1 for c in counts):
             equipment_names.add(f"1 {kind_label[:-1]}")  # Dumbbells -> Dumbbell
         if any(c >= 2 for c in counts):
@@ -666,9 +666,8 @@ def _map_missing_to_equipment_ids(db, missing_tokens: list[str]) -> list[int | N
             """,
             (names_set,), fetch=True
         ) or []
-        print(names_set, rows)
+
         for eq_id, eq_name in rows:
-            print(eq_id, eq_name)
             if eq_name:
                 name_to_id[eq_name.strip().lower()] = eq_id
 
