@@ -1326,6 +1326,15 @@ def allocate_exercises_stochastically_with_bias(
 # Workout generation
 # ---------------------------------------------------------------------
 
+# def hey():
+#     p = Path.cwd() / "app" / "workout" / "exercises.json"
+
+#     print(f"Loading exercises from {p}")
+#     if not p.exists():
+#         raise FileNotFoundError(f"exercises.json not found at {p}")
+
+#     d = pd.read_json(p)
+
 def workout_generator(
         user_id,                # User Id  -> int
         age,                    # age of user -> int
@@ -1349,8 +1358,9 @@ def workout_generator(
     Generate a workout given user info, goals, schedule, and equipment.
     """
     # path = r'app\workout\exercises_original.json'
-    path = r'app\workout\exercises.json'
-    df = pd.read_json('./exercises.json')
+    # path = r'app\workout\exercises.json'
+    path = Path.cwd() / "app" / "workout" / "exercises.json"
+    df = pd.read_json(path)
     # Constants
     avg_time_per_set = 1     # minutes per set
     sets_per_exercise = 4    # sets per exercise
