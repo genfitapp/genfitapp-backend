@@ -65,4 +65,15 @@ def create_app():
     app.register_blueprint(stats_bp)
     app.register_blueprint(media_bp)
 
+    # ---------------------------
+    # Health & root
+    # ---------------------------
+    @app.get("/")
+    def root():
+        return jsonify({"status": "ok", "service": "genfit-backend"})
+
+    @app.get("/healthz")
+    def healthz():
+        return "ok", 200
+
     return app
