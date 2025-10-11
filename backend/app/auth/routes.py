@@ -187,7 +187,7 @@ def register():
         return _json_error("Email is already registered.", 409)
 
     try:
-        pw_hash_str = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        pw_hash_str = bcrypt.hashpw(password, bcrypt.gensalt())
         user_row = create_user(name, email, pw_hash_str, agreed=agreed)
         user = _row_to_user(user_row)
 
