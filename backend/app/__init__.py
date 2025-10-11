@@ -1,7 +1,6 @@
 import os
-import jsonify
 from dotenv import load_dotenv, find_dotenv
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from .auth.routes import auth_bp
 from .profile.routes import profile_bp
