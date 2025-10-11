@@ -55,7 +55,7 @@ def create_user(name: str, email: str, pw_hash: bytes, agreed: bool) -> Tuple[An
     rows = db.execute(
         """INSERT INTO Users (name, email, password, level, workout_number, agreed)
            VALUES (%s, %s, %s, %s, %s, %s) RETURNING *""",
-        (name, email, pw_hash.decode("utf-8"), 1, 0, agreed),
+        (name, email, pw_hash, 1, 0, agreed),
         fetch=True,
     )
     return rows[0]
@@ -187,8 +187,8 @@ def register():
         return _json_error("Email is already registered.", 409)
 
     try:
-        pw_hash = bcrypt.hashpw(password, bcrypt.gensalt())
-        user_row = create_user(name, email, pw_hash, agreed=agreed)
+        pw_hash_str = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        user_row = create_user(name, email, pw_hash_str, agreed=agreed)
         user = _row_to_user(user_row)
 
         venue_id = create_default_venue(user["user_id"], name="Fitness Venue")
