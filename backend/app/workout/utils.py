@@ -1380,10 +1380,14 @@ def workout_generator(
 
     # Configure this section to use the user's self set rest time
     # if none is provided default the the value below
-    if rest_time:
-        rest_time_per_set = int(rest_time)
-    else:
-        rest_time_per_set = get_reps_and_rest_time(training_phase)["rest_time"]
+
+    rest_time_per_set = get_reps_and_rest_time(training_phase)["rest_time"]
+
+
+    # if rest_time:
+    #     rest_time_per_set = int(rest_time)
+    # else:
+    #     rest_time_per_set = get_reps_and_rest_time(training_phase)["rest_time"]
     
     muscle_group = split_dictionary_complex[user_split]["groups"][
         muscle_group_index
