@@ -344,7 +344,7 @@ def generate_user_workout(user_id: int):
                 })
 
             try:
-                db.execute("BEGIN")
+                # db.execute("BEGIN")
                 # update the container rows (date & split)
                 db.execute(
                     """
@@ -411,9 +411,9 @@ def generate_user_workout(user_id: int):
                         (user_id,)
                     )
 
-                db.execute("COMMIT")
+                # db.execute("COMMIT")
             except Exception:
-                db.execute("ROLLBACK")
+                # db.execute("ROLLBACK")
                 raise
 
             exercise_list = fetch_exercise_list(db, int(mr_aw_id))

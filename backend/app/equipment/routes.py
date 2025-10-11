@@ -200,58 +200,6 @@ def get_equipment_id_by_name(name):
         return jsonify({"error": "Database error", "details": str(e)}), 500
 
 
-# @equipment_bp.route("/add", methods=["POST"])
-# def add_equipment():
-#     data = request.get_json(silent=True)
-    
-#     if not data:
-#         return jsonify({"error": "No data provided"}), 400
-
-#     user_id = data.get("user_id")
-#     equipment_id = data.get("equipment_id")
-#     quantity = data.get("quantity", 1)
-    
-#     if not user_id or not equipment_id:
-#         return jsonify({"error": "user_id and equipment_id are required"}), 400
-
-#     try:
-#         # Retrieve the user's current venue ID
-#         query = "SELECT current_venue_id FROM Users WHERE user_id = %s;"
-#         result = db.execute(query, (user_id,), fetch=True)
-        
-#         if not result or not result[0]:
-#             return jsonify({"error": "User not found or current venue not set"}), 404
-        
-#         current_venue_id = result[0][0]
-
-#         # Check if the equipment is already added to the user's list
-#         check_query = """
-#             SELECT venue_equipment_id, quantity FROM Venue_equipment
-#             WHERE venue_id = %s AND equipment_id = %s;
-#         """
-#         check_result = db.execute(check_query, (current_venue_id, equipment_id), fetch=True)
-        
-#         if check_result and len(check_result) > 0:
-#             # Equipment exists; update the quantity by adding the new quantity.
-#             update_query = """
-#                 UPDATE Venue_equipment
-#                 SET quantity = %s
-#                 WHERE venue_id = %s AND equipment_id = %s;
-#             """
-#             db.execute(update_query, (quantity, current_venue_id, equipment_id))
-#             return jsonify({"message": "Equipment quantity updated successfully"}), 200
-
-#         # Equipment does not exist, so insert a new record.
-#         insert_query = """
-#             INSERT INTO Venue_equipment (venue_id, equipment_id, quantity)
-#             VALUES (%s, %s, %s);
-#         """
-#         db.execute(insert_query, (current_venue_id, equipment_id, quantity))
-#     except Exception as e:
-#         return jsonify({"error": "Error adding equipment", "details": str(e)}), 500
-
-#     return jsonify({"message": "Equipment added successfully"}), 200
-
 @equipment_bp.route("/add", methods=["POST"])
 def add_equipment():
     data = request.get_json(silent=True)

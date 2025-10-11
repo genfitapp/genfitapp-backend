@@ -384,7 +384,7 @@ def delete_user_account():
         picture_url = None  # non-fatal
 
     try:
-        db.execute("BEGIN;")
+        # db.execute("BEGIN;")
 
         # 1) Delete children of SUGGESTED/ACTUAL, then parents, then workouts
         db.execute(
@@ -459,7 +459,7 @@ def delete_user_account():
         # 4) Finally, delete the user
         db.execute("DELETE FROM Users WHERE user_id = %s;", (user_id,))
 
-        db.execute("COMMIT;")
+        # db.execute("COMMIT;")
 
         # Post-commit: try to delete the local avatar file if it exists
         try:
@@ -489,172 +489,12 @@ def delete_user_account():
         }), 200
 
     except Exception as e:
-        try:
-            db.execute("ROLLBACK;")
-        except Exception:
-            pass
+        # try:
+        #     # db.execute("ROLLBACK;")
+        # except Exception:
+        #     pass
         return jsonify({
             "error": "Failed to delete user account",
             "details": str(e),
             "success": False
         }), 500
-
-
-
-# @profile_bp.route("/delete", methods=["DELETE"])
-# def delete_user_account():
-#     """
-#     DELETE /profile/delete
-#     Deletes a user and ALL associated data in a single transaction.
-
-#     Expected JSON body:
-#     {
-#       "user_id": <int>,        # required
-#       "message": <string>      # optional; will be sent via send_message(user_id, message)
-#     }
-#     """
-#     data = request.get_json(silent=True)
-#     if not data:
-#         return jsonify({"error": "Request body must be JSON", "success": False}), 400
-
-#     user_id = data.get("user_id")
-#     if not user_id:
-#         return jsonify({"error": "user_id is required", "success": False}), 400
-
-#     message = data.get("message")
-
-#     try:
-#         # Start transaction
-#         db.execute("BEGIN;")
-
-#         # 1) Delete children of SUGGESTED/ACTUAL first, then their parents, then workouts.
-
-#         # Suggested exercise records -> suggested_workouts
-#         db.execute(
-#             """
-#             DELETE FROM suggested_exercise_records
-#             WHERE suggested_workout_id IN (
-#                 SELECT sw.suggested_workout_id
-#                 FROM suggested_workouts sw
-#                 JOIN workouts w ON w.workout_id = sw.workout_id
-#                 WHERE w.user_id = %s
-#             );
-#             """,
-#             (user_id,),
-#         )
-
-#         db.execute(
-#             """
-#             DELETE FROM suggested_workouts
-#             WHERE workout_id IN (
-#                 SELECT workout_id
-#                 FROM workouts
-#                 WHERE user_id = %s
-#             );
-#             """,
-#             (user_id,),
-#         )
-
-#         # Actual exercise records -> actual_workout
-#         db.execute(
-#             """
-#             DELETE FROM actual_exercise_records
-#             WHERE actual_workout_id IN (
-#                 SELECT aw.actual_workout_id
-#                 FROM actual_workout aw
-#                 JOIN workouts w ON w.workout_id = aw.workout_id
-#                 WHERE w.user_id = %s
-#             );
-#             """,
-#             (user_id,),
-#         )
-
-#         db.execute(
-#             """
-#             DELETE FROM actual_workout
-#             WHERE workout_id IN (
-#                 SELECT workout_id
-#                 FROM workouts
-#                 WHERE user_id = %s
-#             );
-#             """,
-#             (user_id,),
-#         )
-
-#         # Now delete the user's workouts (no more dependents)
-#         db.execute(
-#             "DELETE FROM workouts WHERE user_id = %s;",
-#             (user_id,),
-#         )
-
-#         # 2) Delete venue-related data (venue_equipment -> venues)
-#         db.execute(
-#             """
-#             DELETE FROM Venue_equipment
-#             WHERE venue_id IN (
-#                 SELECT venue_id FROM Venues WHERE user_id = %s
-#             );
-#             """,
-#             (user_id,),
-#         )
-
-#         db.execute(
-#             "DELETE FROM Venues WHERE user_id = %s;",
-#             (user_id,),
-#         )
-
-#         # 3) Other direct user-owned tables
-#         db.execute(
-#             "DELETE FROM Milestones WHERE user_id = %s;",
-#             (user_id,),
-#         )
-
-#         db.execute(
-#             "DELETE FROM exercise_preferences WHERE user_id = %s;",
-#             (user_id,),
-#         )
-
-#         db.execute(
-#             "DELETE FROM password_resets WHERE user_id = %s;",
-#             (user_id,),
-#         )
-
-#         # user_providers has ON DELETE CASCADE in your schema, but deleting explicitly is harmless
-#         db.execute(
-#             "DELETE FROM user_providers WHERE user_id = %s;",
-#             (user_id,),
-#         )
-
-#         # 4) Finally, delete the user
-#         db.execute(
-#             "DELETE FROM Users WHERE user_id = %s;",
-#             (user_id,),
-#         )
-
-#         # Commit transaction
-#         db.execute("COMMIT;")
-
-#         # Optional side-effect
-#         if message:
-#             try:
-#                 send_message(user_id, message)
-#             except Exception as _:
-#                 # Don’t fail the delete if messaging fails; just log if you have logging
-#                 pass
-
-#         return jsonify({
-#             "message": "User account and all associated data deleted successfully.",
-#             "success": True
-#         }), 200
-
-#     except Exception as e:
-#         # Roll back on ANY failure
-#         try:
-#             db.execute("ROLLBACK;")
-#         except Exception:
-#             pass
-#         return jsonify({
-#             "error": "Failed to delete user account",
-#             "details": str(e),
-#             "success": False
-#         }), 500

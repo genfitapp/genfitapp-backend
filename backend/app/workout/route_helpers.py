@@ -239,7 +239,7 @@ def persist_generated_workout(db, user_id, user_timezone, generated_exercises, s
 
     created = {}
     try:
-        db.execute("BEGIN")
+        # db.execute("BEGIN")
 
         # Use user's timezone for the workout's calendar date
         user_tz = ZoneInfo(user_timezone)
@@ -330,7 +330,7 @@ def persist_generated_workout(db, user_id, user_timezone, generated_exercises, s
                 fetch=False
             )
 
-        db.execute("COMMIT")
+        # db.execute("COMMIT")
 
         # # Signal the caller that a NEW workout was created, 
         # so the app should clear any running timer.
@@ -339,7 +339,7 @@ def persist_generated_workout(db, user_id, user_timezone, generated_exercises, s
         return created
 
     except Exception:
-        db.execute("ROLLBACK")
+        # db.execute("ROLLBACK")
         raise
 
 def fetch_exercise_list(db, actual_workout_id: int):
