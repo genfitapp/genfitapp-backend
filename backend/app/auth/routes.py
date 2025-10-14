@@ -1,6 +1,7 @@
 from __future__ import annotations
 from flask import Blueprint, request, jsonify, current_app
 from app.db import db
+import os
 import re
 import secrets
 import hashlib
@@ -15,14 +16,17 @@ from .utils import send_reset_email
 # NEW: use Werkzeug PBKDF2-SHA256 (dependency-free, secure)
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# OPTIONAL: for legacy bcrypt hashes only. If not installed, we’ll still work.
-try:
-    import bcrypt as _bcrypt_legacy
-    _BCRYPT_AVAILABLE = True
-except Exception:
-    _BCRYPT_AVAILABLE = False
+# # OPTIONAL: for legacy bcrypt hashes only. If not installed, we’ll still work.
+# try:
+#     import bcrypt as _bcrypt_legacy
+#     _BCRYPT_AVAILABLE = True
+# except Exception:
+#     _BCRYPT_AVAILABLE = False
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+
+HASH_METHOD = os.environ["HASH_METHOD"]
+HASH_SALT = int(os.environ["HASH_SALT"])
 
 # ----------------------------- Utilities (no behavior change) -----------------------------
 
@@ -157,35 +161,13 @@ def _ensure_default_venue(user_id: int) -> Optional[int]:
 # --------------------------- Password hashing helpers (NEW) ---------------------------
 
 def hash_password(plain: str) -> str:
-    # PBKDF2-SHA256 w/ 16-byte salt; Werkzeug defaults to ~260k iterations (secure)
-    return generate_password_hash(plain, method="pbkdf2:sha256", salt_length=16)
-
-def is_bcrypt_hash(stored: str) -> bool:
-    # Typical bcrypt prefixes: $2a$, $2b$, $2y$
-    return stored.startswith("$2a$") or stored.startswith("$2b$") or stored.startswith("$2y$")
+    return generate_password_hash(plain, method=HASH_METHOD, salt_length=HASH_SALT)
 
 def verify_password(stored: str, candidate: str) -> bool:
     if not stored:
         return False
-    if is_bcrypt_hash(stored) and _BCRYPT_AVAILABLE:
-        try:
-            return _bcrypt_legacy.checkpw(candidate.encode("utf-8"), stored.encode("utf-8"))
-        except Exception:
-            return False
-    # Default path: PBKDF2-SHA256 (Werkzeug)
     return check_password_hash(stored, candidate)
 
-def maybe_rehash_to_pbkdf2(user_id: int, stored: str, candidate_ok: bool) -> None:
-    """
-    If the stored hash is a legacy bcrypt hash and the candidate password verified,
-    transparently upgrade to PBKDF2-SHA256.
-    """
-    if candidate_ok and is_bcrypt_hash(stored):
-        try:
-            new_hash = hash_password(candidate="")
-        except TypeError:
-            # We don't have the candidate here; this helper will be called with it below
-            pass
 
 # ----------------------------------- Auth: Register/Login -----------------------------------
 
@@ -241,15 +223,6 @@ def login():
     ok = verify_password(stored, password)
     if not ok:
         return _json_error("Invalid credentials.", 201)
-
-    # On successful login, if legacy bcrypt hash, transparently upgrade to PBKDF2
-    if is_bcrypt_hash(stored):
-        try:
-            new_hash = hash_password(password)
-            db.execute("UPDATE Users SET password=%s WHERE user_id=%s", (new_hash, user["user_id"]))
-        except Exception:
-            # Non-fatal: log and continue
-            current_app.logger.exception("Bcrypt->PBKDF2 rehash failed for user_id=%s", user["user_id"])
 
     return jsonify({"success": True, "user_id": user["user_id"]})
 

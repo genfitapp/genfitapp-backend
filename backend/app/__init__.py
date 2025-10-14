@@ -78,9 +78,9 @@ def create_app():
         return "ok", 200
 
     # ---------------------------
-    # Ensure DB on startup
+    # Ensure DB init on startup
     # ---------------------------
-    populate_exercise_table(db, drop=True)
-
+    # populate_exercise_table(db, drop=True)
     # populate_exercise_table -> params: db, drop=False
+    
     return app
