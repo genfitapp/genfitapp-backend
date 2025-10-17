@@ -74,20 +74,6 @@ def get_user_records(user_id, month, year):
                     except (TypeError, ValueError):
                         continue
 
-                # Parse numeric intensities only (skip "Bodyweight", band colors/names, etc.)
-                # numeric_intensity = []
-                # for v in flatten(intensity_arr or []):
-                #     if isinstance(v, (int, float)):
-                #         numeric_intensity.append(float(v))
-                #     elif isinstance(v, str):
-                #         vv = v.strip()
-                #         # digits with at most one decimal point
-                #         if vv and all(ch.isdigit() or ch == '.' for ch in vv) and vv.replace('.', '', 1).isdigit():
-                #             try:
-                #                 numeric_intensity.append(float(vv))
-                #             except ValueError:
-                #                 pass
-
                 numeric_intensity = []
 
                 if exercise_type == 'Gym Equipment':

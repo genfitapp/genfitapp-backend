@@ -1,32 +1,25 @@
 from __future__ import annotations
-from flask import Blueprint, request, jsonify, current_app
-from app.db import db
-import os
+# --- Standard library ---
+# import os
 import re
+import json
 import secrets
 import hashlib
-import jwt
-from jwt.algorithms import RSAAlgorithm
-import json
-import requests
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional, Tuple, Iterable
+# --- Third-party packages ---
+import bcrypt
+import jwt
+import requests
+from flask import Blueprint, request, jsonify, current_app
+from jwt.algorithms import RSAAlgorithm
+# --- Local modules ---
+from app.db import db
 from .utils import send_reset_email
 
-# NEW: use Werkzeug PBKDF2-SHA256 (dependency-free, secure)
-from werkzeug.security import generate_password_hash, check_password_hash
 
-# # OPTIONAL: for legacy bcrypt hashes only. If not installed, we’ll still work.
-# try:
-#     import bcrypt as _bcrypt_legacy
-#     _BCRYPT_AVAILABLE = True
-# except Exception:
-#     _BCRYPT_AVAILABLE = False
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
-
-HASH_METHOD = os.environ["HASH_METHOD"]
-HASH_SALT = int(os.environ["HASH_SALT"])
 
 # ----------------------------- Utilities (no behavior change) -----------------------------
 
@@ -161,12 +154,21 @@ def _ensure_default_venue(user_id: int) -> Optional[int]:
 # --------------------------- Password hashing helpers (NEW) ---------------------------
 
 def hash_password(plain: str) -> str:
-    return generate_password_hash(plain, method=HASH_METHOD, salt_length=HASH_SALT)
+    """Hash a plaintext password using bcrypt."""
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(plain.encode("utf-8"), salt)
+    return hashed.decode("utf-8")  # Store as string in DB
+
 
 def verify_password(stored: str, candidate: str) -> bool:
+    """Verify a plaintext password against a stored bcrypt hash."""
     if not stored:
         return False
-    return check_password_hash(stored, candidate)
+    try:
+        return bcrypt.checkpw(candidate.encode("utf-8"), stored.encode("utf-8"))
+    except Exception:
+        return False
+
 
 
 # ----------------------------------- Auth: Register/Login -----------------------------------
@@ -380,12 +382,14 @@ def forgot_password():
             app_link = f"{app_scheme}://reset?token={raw_token}"
             try:
                 send_reset_email(email, app_link)
+                print("Done!")
             except Exception:
-                current_app.logger.exception("reset email send failed")
-            current_app.logger.info(f"[forgot] reset issued uid={user['user_id']} exp={exp.isoformat()}")
+                print("reset email send failed")
+            print(f"[forgot] reset issued uid={user['user_id']} exp={exp.isoformat()}")
         except Exception:
-            current_app.logger.exception("reset issuance failed")
-
+            print("reset issuance failed")
+    else:
+        print("Invalid email...")
     return jsonify({"ok": True})
 
 @auth_bp.route("/reset", methods=["POST"])

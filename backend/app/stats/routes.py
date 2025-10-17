@@ -496,7 +496,7 @@ def get_pie_stats(user_id):
             group_volumes[group] += float(volume or 0.0)
 
         total_volume = sum(group_volumes.values()) or 1.0
-
+        
         pie_data = [
             {
                 "label": group,

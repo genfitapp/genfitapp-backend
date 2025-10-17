@@ -1906,71 +1906,71 @@ def get_recommend_split(user_id):
         return jsonify({"success": False, "error": str(e)}), 500
 
 
-@workout_bp.route("/adjust_difficulty/<string:mode>/<int:exercise_id>/<int:user_id>", methods=["POST"])
-def adjust_exercise_difficulty(mode, exercise_id, user_id):
-    try:
-        if mode not in ["challenge", "easy"]:
-            return jsonify({"error": "Invalid mode. Must be 'challenge' or 'easy'."}), 400
+# @workout_bp.route("/adjust_difficulty/<string:mode>/<int:exercise_id>/<int:user_id>", methods=["POST"])
+# def adjust_exercise_difficulty(mode, exercise_id, user_id):
+#     try:
+#         if mode not in ["challenge", "easy"]:
+#             return jsonify({"error": "Invalid mode. Must be 'challenge' or 'easy'."}), 400
 
-        # Get the user’s experience level
-        user_query = "SELECT level FROM Users WHERE user_id = %s;"
-        user_result = db.execute(user_query, (user_id,), fetch=True)
-        if not user_result:
-            return jsonify({"error": "User not found"}), 404
-        user_level = user_result[0][0]
+#         # Get the user’s experience level
+#         user_query = "SELECT level FROM Users WHERE user_id = %s;"
+#         user_result = db.execute(user_query, (user_id,), fetch=True)
+#         if not user_result:
+#             return jsonify({"error": "User not found"}), 404
+#         user_level = user_result[0][0]
 
-        # Get the current exercise data
-        exercise_query = """
-            SELECT name, progression, regression, difficulty 
-            FROM Exercises 
-            WHERE exercise_id = %s;
-        """
-        result = db.execute(exercise_query, (exercise_id,), fetch=True)
-        if not result:
-            return jsonify({"error": "Exercise not found"}), 404
+#         # Get the current exercise data
+#         exercise_query = """
+#             SELECT name, progression, regression, difficulty 
+#             FROM Exercises 
+#             WHERE exercise_id = %s;
+#         """
+#         result = db.execute(exercise_query, (exercise_id,), fetch=True)
+#         if not result:
+#             return jsonify({"error": "Exercise not found"}), 404
 
-        current_name, progression, regression, current_difficulty = result[0]
-        candidates = progression if mode == "challenge" else regression
-        candidates = candidates or []
+#         current_name, progression, regression, current_difficulty = result[0]
+#         candidates = progression if mode == "challenge" else regression
+#         candidates = candidates or []
 
-        # Load candidate exercises and compare difficulty
-        filtered_exercises = []
-        for name in candidates:
-            alt_query = "SELECT exercise_id, name, difficulty FROM Exercises WHERE name = %s;"
-            alt_result = db.execute(alt_query, (name,), fetch=True)
-            if alt_result:
-                ex_id, ex_name, ex_difficulty = alt_result[0]
-                if (
-                    (mode == "challenge" and ex_difficulty <= user_level + 1) or
-                    (mode == "easy" and ex_difficulty <= user_level)
-                ):
-                    filtered_exercises.append({
-                        "exercise_id": ex_id,
-                        "name": ex_name,
-                        "difficulty": ex_difficulty
-                    })
+#         # Load candidate exercises and compare difficulty
+#         filtered_exercises = []
+#         for name in candidates:
+#             alt_query = "SELECT exercise_id, name, difficulty FROM Exercises WHERE name = %s;"
+#             alt_result = db.execute(alt_query, (name,), fetch=True)
+#             if alt_result:
+#                 ex_id, ex_name, ex_difficulty = alt_result[0]
+#                 if (
+#                     (mode == "challenge" and ex_difficulty <= user_level + 1) or
+#                     (mode == "easy" and ex_difficulty <= user_level)
+#                 ):
+#                     filtered_exercises.append({
+#                         "exercise_id": ex_id,
+#                         "name": ex_name,
+#                         "difficulty": ex_difficulty
+#                     })
 
-        if not filtered_exercises:
-            return jsonify({"message": "No suitable alternatives found"}), 200
+#         if not filtered_exercises:
+#             return jsonify({"message": "No suitable alternatives found"}), 200
 
-        # For now, return the first match (you can randomize later)
-        return jsonify({"replacement": filtered_exercises[0], "success": True}), 200
+#         # For now, return the first match (you can randomize later)
+#         return jsonify({"replacement": filtered_exercises[0], "success": True}), 200
 
-    except Exception as e:
-        return jsonify({"error": "Failed to adjust difficulty", "details": str(e)}), 500
+#     except Exception as e:
+#         return jsonify({"error": "Failed to adjust difficulty", "details": str(e)}), 500
 
 
 @workout_bp.route("/database", methods=["GET"])
 def exercise_database():
     try:
         query = """
-            SELECT exercise_id, name
+            SELECT exercise_id, name, animation
             FROM Exercises;
         """
         rows = db.execute(query, fetch=True)
 
         """ Will have to add the exercise image path of the actual image. """
-        exercises = [{"exercise_id": row[0], "name": row[1]} for row in rows]
+        exercises = [{"exercise_id": row[0], "name": row[1], "video_link": row[2]} for row in rows]
 
         return jsonify({"exercises": exercises, "success": True}), 200
 

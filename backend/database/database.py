@@ -27,13 +27,15 @@ class Database:
             database=db_name,
             user=db_user,
             password=db_password,
-            sslmode="require",
-            connect_timeout=10,
-            keepalives=1,
-            keepalives_idle=30,
-            keepalives_interval=10,
-            keepalives_count=3,
-            options="-c statement_timeout=60000 -c idle_in_transaction_session_timeout=60000"
+
+            # Comment code below for dev
+            # sslmode="require",
+            # connect_timeout=10,
+            # keepalives=1,
+            # keepalives_idle=30,
+            # keepalives_interval=10,
+            # keepalives_count=3,
+            # options="-c statement_timeout=60000 -c idle_in_transaction_session_timeout=60000"
         )
 
 

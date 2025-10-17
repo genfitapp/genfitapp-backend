@@ -29,18 +29,32 @@ def _brevo_client() -> sib_api_v3_sdk.TransactionalEmailsApi:
     return sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(cfg))
 
 
-def _sender_from_config() -> dict:
+# def sender_from_config() -> dict:
+#     """
+#     MAIL_FROM can be:
+#       - 'GenFit <no-reply@example.com>' -> {'name': 'GenFit', 'email': 'no-reply@example.com'}
+#       - 'no-reply@example.com'          -> {'email': 'no-reply@example.com'}
+#     """
+#     sender = _require_env("MAIL_FROM")
+#     if "<" in sender and ">" in sender:
+#         name = sender.split("<")[0].strip().strip('"')
+#         addr = sender.split("<")[1].split(">")[0].strip()
+#         return {"name": name, "email": addr}
+#     return {"email": sender}
+
+
+def sender_from_config() -> dict:
     """
     MAIL_FROM can be:
-      - 'GenFit <no-reply@example.com>' -> {'name': 'GenFit', 'email': 'no-reply@example.com'}
-      - 'no-reply@example.com'          -> {'email': 'no-reply@example.com'}
+      - 'GenFit <no-reply@example.com>' -> {'name': 'GenFit', 'email': 'noreply@example.com'}
+      - 'no-reply@example.com'          -> {'email': 'noreply@example.com'}
     """
-    sender = _require_env("MAIL_FROM")
-    if "<" in sender and ">" in sender:
-        name = sender.split("<")[0].strip().strip('"')
-        addr = sender.split("<")[1].split(">")[0].strip()
-        return {"name": name, "email": addr}
-    return {"email": sender}
+    sender_email = _require_env("MAIL_FROM")
+    # print(sender_email)
+    return {
+        'name': 'GenFit',
+        'email': sender_email
+    }
 
 
 def _attachments_for_brevo(files) -> list[dict]:
@@ -82,7 +96,7 @@ def send_support_request():
         """
 
         payload = sib_api_v3_sdk.SendSmtpEmail(
-            sender=_sender_from_config(),
+            sender=sender_from_config(),
             to=[{"email": _require_env("ADMIN_EMAIL")}],
             subject="New Support Request",
             html_content=html_body,
@@ -130,7 +144,7 @@ def send_user_feedback():
         """
 
         payload = sib_api_v3_sdk.SendSmtpEmail(
-            sender=_sender_from_config(),
+            sender=sender_from_config(),
             to=[{"email": _require_env("ADMIN_EMAIL")}],
             subject=f"Feedback Received: {subject}",
             html_content=html_body,

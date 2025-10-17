@@ -1,14 +1,12 @@
 # utils.py
 import os
+import sib_api_v3_sdk
+
 from dotenv import load_dotenv, find_dotenv
 from flask import current_app
-
-# NEW: Brevo SDK imports
-import sib_api_v3_sdk
-# from sib_api_v3_sdk.rest import ApiException
+from ..support.routes import sender_from_config
 
 load_dotenv(find_dotenv(usecwd=True))
-
 
 def send_reset_email(to_email: str, app_link: str, web_link: str | None = None) -> None:
     """
@@ -133,25 +131,24 @@ def send_reset_email(to_email: str, app_link: str, web_link: str | None = None) 
             </html>
         """
 
-        # Compose & send via Brevo
-        sender = current_app.config.get("MAIL_FROM", "ouattarabilly33@gmail.com")
-        # Brevo needs a plain email address and optional name split:
-        if "<" in sender and ">" in sender:
-            name = sender.split("<")[0].strip().strip('"').strip()
-            addr = sender.split("<")[1].split(">")[0].strip()
-            sender_obj = {"name": name, "email": addr}
-        else:
-            sender_obj = {"email": sender}
-
+        sender = sender_from_config()       
         payload = sib_api_v3_sdk.SendSmtpEmail(
             to=[{"email": to_email}],
-            sender=sender_obj,
+            sender=sender,
             subject="Reset your GenFit password",
             html_content=html,
             text_content=text,
         )
+        
         resp = emails_api.send_transac_email(payload)
-        print(resp)
-        print("Sender: ", sender)
+
+        # log the Brevo message id if available
+        msg_id = getattr(resp, "message_id", None)
+        print(f"[forgot] reset email queued to={to_email} message_id={msg_id}")
+    except sib_api_v3_sdk.rest.ApiException as api_err:
+        # Log full API error with response body for debugging
+        print(f"[forgot] Brevo API error: {api_err}")
+        raise
     except Exception:
+        print("[forgot] failed to send reset email via Brevo")
         current_app.logger.exception("[forgot] failed to send reset email via Brevo")
