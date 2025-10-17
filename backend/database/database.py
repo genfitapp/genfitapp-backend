@@ -29,13 +29,13 @@ class Database:
             password=db_password,
 
             # Comment code below for dev
-            # sslmode="require",
-            # connect_timeout=10,
-            # keepalives=1,
-            # keepalives_idle=30,
-            # keepalives_interval=10,
-            # keepalives_count=3,
-            # options="-c statement_timeout=60000 -c idle_in_transaction_session_timeout=60000"
+            sslmode="require",
+            connect_timeout=10,
+            keepalives=1,
+            keepalives_idle=30,
+            keepalives_interval=10,
+            keepalives_count=3,
+            options="-c statement_timeout=60000 -c idle_in_transaction_session_timeout=60000"
         )
 
 
